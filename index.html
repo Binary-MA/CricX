@@ -4,8 +4,8 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Stream live sports matches effortlessly on any device. Join our WhatsApp group for the latest updates.">
-    <meta name="keywords" content="sports streaming, live matches, watch cricket, Pakistan vs New Zealand">
-    <title>Live Sports Streaming</title>
+    <meta name="keywords" content="sports streaming, live matches, watch football, WhatsApp sports updates">
+    <title>Sports Streaming</title>
     <style>
         .instruction-box, #playerContainer {
             width: 100%;
@@ -36,7 +36,6 @@
             width: 100%;
             height: 100%;
             display: block;
-            border: none;
         }
 
         .whatsapp-button {
@@ -44,6 +43,7 @@
             background-color: #25D366;
             color: white;
             padding: 12px 20px;
+            border: none;
             border-radius: 8px;
             cursor: pointer;
             font-size: 14px;
@@ -52,6 +52,7 @@
             margin: 15px auto;
             width: 100%;
             max-width: 720px;
+            box-sizing: border-box;
             transition: background-color 0.3s ease;
         }
 
@@ -61,20 +62,25 @@
 
         #playlist {
             display: flex;
-            justify-content: center;
+            gap: 10px;
             margin-top: 10px;
+            justify-content: center;
+            flex-wrap: wrap;
+            padding: 0 10px;
         }
 
         button {
-            padding: 10px 15px;
+            width: 100%;
+            max-width: 350px;
+            padding: 8px 12px;
             font-size: 14px;
             cursor: pointer;
             border-radius: 5px;
             border: 1px solid #333;
             background-color: #f0f0f0;
             color: #333;
-            width: 100%;
-            max-width: 350px;
+            height: auto;
+            box-sizing: border-box;
         }
 
         @media (max-width: 768px) {
@@ -101,17 +107,17 @@
 <body>
 
 <div class="instruction-box">
-    Instructions: Click the button below to start streaming. If the video doesn’t load, wait a few seconds and try again.
+    Instructions: Click the button below to start streaming. If the video doesn’t load immediately, please wait a few seconds and try again.
 </div>
 
 <div id="loadingMessage" style="display: none;">Loading stream...</div>
 
 <div id="playerContainer">
-    <iframe id="playerIframe" src="" sandbox="allow-scripts allow-same-origin"></iframe>
+    <iframe id="playerIframe" src="" style="display: none;" sandbox="allow-scripts allow-same-origin"></iframe>
 </div>
 
 <div id="playlist">
-    <button onclick="loadVideo()">Pakistan v New Zealand</button>
+    <button onclick="loadVideo()">Pakistan vs New Zealand</button>
 </div>
 
 <a href="https://whatsapp.com/channel/0029Vb32mMt23n3ZBynqbY2l" class="whatsapp-button">Join WhatsApp Group</a>
@@ -119,13 +125,12 @@
 <script type="text/javascript">
 function loadVideo() {
     document.getElementById("loadingMessage").style.display = "block";
-    const videoURL = "https://www.hlsplayer.net/embed?type=m3u8&src=https://saseries.akamaized.net/hls/live/2110097/tappak/hdntl=exp=1739090089~acl=%2f*~data=hdntl~hmac=1d7f55d8c8bb45d561f1ef673229e7c0048baba684e9c8a30a41b857361eca27/level_4.m3u8?hdnts=exp=1739004546~acl=/hls/*~hmac=fb83303b26d3574ea685899b1027f35c4e3831bd48d3bc87987bbbc19174b810";
     
     document.getElementById("playerIframe").onload = function() {
         document.getElementById("loadingMessage").style.display = "none";
     };
-
-    document.getElementById("playerIframe").src = videoURL;
+    document.getElementById("playerIframe").style.display = "block";
+    document.getElementById("playerIframe").src = "https://m3u8player.org/player.html?url=https://mut1.mylife1.top:8088/live/webcricm04/playlist.m3u8?vidictid=201277957972&id=114515&pk=f2a0b8e8da9ff5c7305afab856bbf6349d474d7964b3e20318f6c218c6c5f3c53ecf39e89879fe5bd490f2f1ec019803b0d330348e5e9d6fd540fce8af0c33d1";
 }
 </script>
 
