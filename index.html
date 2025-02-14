@@ -7,6 +7,14 @@
     <meta name="keywords" content="sports streaming, live matches, watch football, WhatsApp sports updates">
     <title>Sports Streaming</title>
     <style>
+        body {
+            font-family: Arial, sans-serif;
+            background-color: #f9f9f9;
+            text-align: center;
+            margin: 0;
+            padding: 0;
+        }
+
         .instruction-box, #playerContainer {
             width: 100%;
             max-width: 100%;
@@ -20,7 +28,6 @@
             border: 2px solid #ffce00;
             padding: 8px;
             border-radius: 5px;
-            text-align: center;
             font-weight: bold;
         }
 
@@ -35,7 +42,8 @@
         #playerIframe {
             width: 100%;
             height: 100%;
-            display: block;
+            display: none;
+            border: none;
         }
 
         .whatsapp-button {
@@ -43,16 +51,11 @@
             background-color: #25D366;
             color: white;
             padding: 12px 20px;
-            border: none;
             border-radius: 8px;
-            cursor: pointer;
             font-size: 14px;
             text-decoration: none;
-            text-align: center;
-            margin: 15px auto;
             width: 100%;
             max-width: 720px;
-            box-sizing: border-box;
             transition: background-color 0.3s ease;
         }
 
@@ -79,8 +82,6 @@
             border: 1px solid #333;
             background-color: #f0f0f0;
             color: #333;
-            height: auto;
-            box-sizing: border-box;
         }
 
         @media (max-width: 768px) {
@@ -110,17 +111,21 @@
     Instructions: Click the button below to start streaming. If the video doesn’t load immediately, please wait a few seconds and try again.
 </div>
 
-<div id="loadingMessage" style="display: none;">Loading stream...</div>
+<div id="loadingMessage" style="display: none; font-weight: bold;">Loading stream...</div>
 
 <div id="playerContainer">
-    <iframe id="playerIframe" src="" style="display: none;" sandbox="allow-scripts allow-same-origin"></iframe>
+    <iframe id="playerIframe" sandbox="allow-scripts allow-same-origin"></iframe>
 </div>
 
 <div id="playlist">
-    <button onclick="loadVideo('https://59.scjustfor.info/mobile/stream2_240p/playlist.m3u8?vidictid=201337722699&id=6&pk=c726adbd98c4197d8139c9a50c40a05e5aa7ddbf664187a30b932ee647f4ef44')">Pakistan vs Newzeland</button>
+    <button onclick="loadVideo('https://59.scjustfor.info/mobile/stream2_240p/playlist.m3u8?vidictid=201337722699&id=6&pk=c726adbd98c4197d8139c9a50c40a05e5aa7ddbf664187a30b932ee647f4ef44')">
+        Pakistan vs New Zealand
+    </button>
 </div>
 
-<a href="https://whatsapp.com/channel/0029Vb32mMt23n3ZBynqbY2l" class="whatsapp-button">Join WhatsApp Group</a>
+<a href="https://whatsapp.com/channel/0029Vb32mMt23n3ZBynqbY2l" class="whatsapp-button">
+    Join WhatsApp Group
+</a>
 
 <script type="text/javascript">
 function loadVideo(url) {
@@ -129,6 +134,7 @@ function loadVideo(url) {
     document.getElementById("playerIframe").onload = function() {
         document.getElementById("loadingMessage").style.display = "none";
     };
+    
     document.getElementById("playerIframe").style.display = "block";
     document.getElementById("playerIframe").src = "https://m3u8player.org/player.html?url=" + encodeURIComponent(url);
 }
