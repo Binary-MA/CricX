@@ -3,197 +3,163 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Stream live sports matches effortlessly on any device. Join our WhatsApp group for the latest updates.">
-    <meta name="keywords" content="sports streaming, live matches, watch football, WhatsApp sports updates">
-    <title>Sports Streaming</title>
-    
-    <!-- Video.js Library -->
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.3.0/video-js.min.css" rel="stylesheet">
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/video.js/8.3.0/video.min.js"></script>
-
+    <title>CricX Stream</title>
     <style>
-        .instruction-box, #playerContainer {
-            width: 100%;
-            max-width: 100%;
-            margin: 15px auto;
+        body {
+            font-family: Arial, sans-serif;
+            text-align: center;
+            background-color: #f8f9fa;
+            margin: 0;
+            padding: 0;
         }
 
         .instruction-box {
             font-size: 14px;
-            color: #333;
             background-color: #fffae5;
             border: 2px solid #ffce00;
             padding: 8px;
+            margin: 10px auto;
+            width: 90%;
             border-radius: 5px;
-            text-align: center;
             font-weight: bold;
         }
 
         #playerContainer {
-            position: relative;
-            background-color: black;
             width: 100%;
             max-width: 100%;
             height: 250px;
+            background-color: black;
+            margin: 10px auto;
+            position: relative;
         }
 
-        #hlsPlayer {
+        iframe {
             width: 100%;
             height: 100%;
+            border: none;
+            display: block;
+        }
+
+        #loadingMessage {
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            color: white;
+            font-size: 16px;
+            background-color: rgba(0, 0, 0, 0.7);
+            padding: 10px 15px;
+            border-radius: 5px;
             display: none;
         }
 
-        #playerIframe {
-            width: 100%;
-            height: 100%;
-            display: none;
+        #playlist {
+            width: 90%;
+            margin: 10px auto;
+        }
+
+        .match-item {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin: 10px 0;
+        }
+
+        .match-button {
+            padding: 8px 12px;
+            font-size: 14px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: white;
+            color: black;
+            flex: 1;
+            text-align: left;
+        }
+
+        .external-button {
+            padding: 5px 8px;
+            font-size: 16px;
+            border: 1px solid #ccc;
+            border-radius: 5px;
+            cursor: pointer;
+            background-color: white;
+            color: orange;
+            margin-left: 5px;
         }
 
         .whatsapp-button {
             display: inline-block;
             background-color: #25D366;
             color: white;
-            padding: 12px 20px;
-            border: none;
-            border-radius: 8px;
-            cursor: pointer;
-            font-size: 14px;
-            text-decoration: none;
-            text-align: center;
-            margin: 15px auto;
-            width: 100%;
-            max-width: 720px;
-            box-sizing: border-box;
-            transition: background-color 0.3s ease;
-        }
-
-        .whatsapp-button:hover {
-            background-color: #128C7E;
-        }
-
-        #playlist {
-            display: flex;
-            gap: 10px;
-            margin-top: 10px;
-            justify-content: center;
-            flex-wrap: wrap;
-            padding: 0 10px;
-        }
-
-        button {
-            width: 100%;
-            max-width: 350px;
             padding: 8px 12px;
             font-size: 14px;
-            cursor: pointer;
+            text-decoration: none;
             border-radius: 5px;
-            border: 1px solid #333;
-            background-color: #f0f0f0;
-            color: #333;
-            height: auto;
-            box-sizing: border-box;
-        }
-
-        @media (max-width: 768px) {
-            .instruction-box {
-                font-size: 13px;
-                padding: 6px;
-            }
-
-            button {
-                font-size: 12px;
-                padding: 6px 8px;
-            }
-
-            .whatsapp-button {
-                font-size: 13px;
-            }
-
-            #playerContainer {
-                height: 200px;
-            }
+            border: 1px solid #ccc;
+            margin-top: 10px;
         }
     </style>
 </head>
 <body>
 
 <div class="instruction-box">
-    Instructions: Click on the button and wait at least 1 minute. Click the video button to play. If it stops, refresh the page.
+    Click on a match to play. If it stops, refresh or try an external player.
 </div>
-
-<div id="loadingMessage" style="display: none;">Loading stream...</div>
 
 <div id="playerContainer">
-    <video id="hlsPlayer" class="video-js vjs-default-skin" controls preload="auto" width="100%" height="250" style="display: none;">
-        <source id="hlsSource" src="" type="application/x-mpegURL">
-    </video>
-    <iframe id="playerIframe" src="" style="display: none;" sandbox="allow-scripts allow-same-origin"></iframe>
+    <div id="loadingMessage">Loading... 0%</div>
+    <iframe id="playerFrame" allow="autoplay" src=""></iframe>
 </div>
 
-<div id="playlist"></div>
+<div id="playlist">
+    <div class="match-item">
+        <button class="match-button" onclick="loadVideo('https://cdn07isb.tamashaweb.com:8087/YlUHeDQb7a/157-3H/playlist.m3u8')">CT25 Permanent Link</button>
+        <button class="external-button" onclick="openExternal('https://cdn07isb.tamashaweb.com:8087/YlUHeDQb7a/157-3H/playlist.m3u8')">🔗</button>
+    </div>
+    <div class="match-item">
+        <button class="match-button" onclick="loadVideo('https://ml-pull-hwc.myco.io/stream1/hls/stream1.m3u8')">CT25 Permanent Link 2</button>
+        <button class="external-button" onclick="openExternal('https://ml-pull-hwc.myco.io/stream1/hls/stream1.m3u8')">🔗</button>
+    </div>
+    <div class="match-item">
+        <button class="match-button" onclick="loadVideo('https://hocdn.news/live/starhindi.m3u8')">CT25 Permanent Hindi</button>
+        <button class="external-button" onclick="openExternal('https://hocdn.news/live/starhindi.m3u8')">🔗</button>
+    </div>
+</div>
 
-<a href="https://whatsapp.com/channel/0029Vb32mMt23n3ZBynqbY2l" class="whatsapp-button" alt="Join our WhatsApp group">Join WhatsApp Group</a>
+<a href="https://chat.whatsapp.com/YOUR-GROUP-LINK" class="whatsapp-button">
+    Join WhatsApp Group
+</a>
 
-<script type="text/javascript">
-const options = {
-    player_list: [
-        { "file": "https://saseries.akamaized.net/hls/live/2110097/tappak/hdntl=exp=1740126971~acl=%2f*~data=hdntl~hmac=33cc83f9a74f2bba99f8d19ba15676f27b968381785247be4b2ae465f67c3046/level_4.m3u8?hdnts=exp=1740041461~acl=/hls/*~hmac=d1a0ae718e430c58f172ecac519ca2514e678e47a8ea31303402cbfd10dc1769", "title": "IND vs BAN", "type": "m3u8" },
-        { "file": "https://cdn07isb.tamashaweb.com:8087/YlUHeDQb7a/157-3H/playlist.m3u8", "title": "CT25 permanent link", "type": "m3u8" },
-        { "file": "https://ml-pull-hwc.myco.io/stream1/hls/stream1.m3u8", "title": "CT25 permanent link 2", "type": "m3u8" },
-        { "file": "https://genewta1.activityrearfvk2sk.cfd/cricket/icc-champions-trophy-1864308/bangladesh-vs-india.html?icg=UEs&ilang=en", "title": "CT25 permanent", "type": "php" },
-        { "file": "https://www.hlsplayer.net/embed?type=m3u8&src=https://starshare.live/live/Money12345/Money12345/196594.m3u8", "title": "CT25 TEN CRICKET", "type": "php" }
-    ]
-};
+<script>
+    function loadVideo(url) {
+        const playerFrame = document.getElementById("playerFrame");
+        const loadingMessage = document.getElementById("loadingMessage");
 
-function loadVideo(videoFile, type) {
-    document.getElementById("loadingMessage").style.display = "block";
+        loadingMessage.style.display = "block";
+        playerFrame.style.display = "none";
 
-    // Hide both players initially
-    document.getElementById("hlsPlayer").style.display = "none";
-    document.getElementById("playerIframe").style.display = "none";
-
-    if (type === "m3u8") {
-        const hlsPlayer = document.getElementById("hlsPlayer");
-        const hlsSource = document.getElementById("hlsSource");
-
-        hlsSource.src = videoFile;
-        hlsPlayer.load();
-        hlsPlayer.style.display = "block";
-
-        hlsPlayer.oncanplay = () => {
-            document.getElementById("loadingMessage").style.display = "none";
-        };
-    } else if (type === "php") {
-        const playerIframe = document.getElementById("playerIframe");
-
-        playerIframe.onload = function () {
-            document.getElementById("loadingMessage").style.display = "none";
-        };
-
-        playerIframe.onerror = function () {
-            alert("Failed to load the video. Please try another link.");
-            document.getElementById("loadingMessage").style.display = "none";
-        };
-
-        playerIframe.src = videoFile;
-        playerIframe.style.display = "block";
+        let progress = 0;
+        const interval = setInterval(() => {
+            progress += 10;
+            loadingMessage.textContent = `Loading... ${progress}%`;
+            if (progress >= 100) {
+                clearInterval(interval);
+                loadingMessage.style.display = "none";  // Hides loading message
+                playerFrame.style.display = "block";
+                playerFrame.src = url + "?autoplay=1";
+            }
+        }, 300);
     }
-}
 
-const playlistContainer = document.getElementById("playlist");
-options.player_list.forEach((video) => {
-    const button = document.createElement("button");
-    button.textContent = video.title;
-    button.onclick = () => {
-        loadVideo(video.file, video.type);
+    function openExternal(url) {
+        window.location.href = `intent:${url}#Intent;action=android.intent.action.VIEW;type=video/mp4;end;`;
+    }
+
+    // Auto-play first video on page load
+    window.onload = function() {
+        loadVideo('https://cdn07isb.tamashaweb.com:8087/YlUHeDQb7a/157-3H/playlist.m3u8');
     };
-    playlistContainer.appendChild(button);
-});
-
-window.onload = () => {
-    const firstVideo = options.player_list[0];
-    loadVideo(firstVideo.file, firstVideo.type);
-};
 </script>
 
 </body>
