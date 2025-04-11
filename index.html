@@ -3,14 +3,14 @@
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>CricX Stream</title>
+  <title>Stream Player</title>
+  <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <style>
     body {
-      font-family: Arial, sans-serif;
-      text-align: center;
-      background-color: #f8f9fa;
       margin: 0;
-      padding: 0;
+      font-family: Arial, sans-serif;
+      background-color: #f5f5f5;
+      text-align: center;
     }
 
     .instruction-box {
@@ -25,19 +25,15 @@
     }
 
     #playerContainer {
-      width: 100%;
-      max-width: 100%;
-      height: 250px;
-      background-color: black;
-      margin: 10px auto;
       position: relative;
+      width: 100%;
+      background-color: black;
     }
 
-    iframe {
+    iframe, video {
       width: 100%;
-      height: 100%;
+      height: 250px;
       border: none;
-      display: block;
     }
 
     #loadingMessage {
@@ -50,7 +46,7 @@
       background-color: rgba(0, 0, 0, 0.7);
       padding: 10px 15px;
       border-radius: 5px;
-      display: none;
+      z-index: 9;
     }
 
     #playlist {
@@ -100,22 +96,26 @@
       margin-top: 10px;
     }
 
-    /* Hide common ad elements */
-    iframe[src*="ads"], iframe[src*="doubleclick"], .ad, .ads, .advert, .sponsor, .popup, .overlay, [id*="ad"], [class*="ad"] {
-      display: none !important;
-      visibility: hidden !important;
+    #iframePlayer {
+      display: none;
+    }
+
+    #hlsPlayer {
+      display: none;
     }
   </style>
 </head>
 <body>
 
 <div class="instruction-box">
-  Click on a match name or video to play. If it stops, refresh or try an MX or VLC player etc. by clicking on (🔗).
+  Click on a match to play. Use MX/VLC if it stops (🔗).
 </div>
 
 <div id="playerContainer">
-  <div id="loadingMessage">Loading... 0%</div>
-  <iframe id="playerFrame" allow="autoplay" src=""></iframe>
+  <div id="loadingMessage">Loading... Please wait</div>
+
+  <video id="hlsPlayer" controls autoplay muted></video>
+  <iframe id="iframePlayer" sandbox="allow-scripts allow-same-origin allow-presentation" allowfullscreen></iframe>
 </div>
 
 <div id="playlist"></div>
@@ -126,60 +126,84 @@
 
 <script>
   const matches = [
-    { name: "PSL Link 1", link: "https://topembed.pw/channel/exislamars" },
-    { name: "PSL Link 2", link: "https://topembed.pw/channel/SkySportsMix[UK]" }
+    {
+      name: "M3U8 Link 1",
+      type: "hls",
+      link: "https://edge11.ekiga.live/psl2024/tracks-v1a1/mono.m3u8"
+    },
+    {
+      name: "Iframe Link 2",
+      type: "iframe",
+      link: "https://short.ink/embedpage" // your embed iframe URL
+    }
   ];
 
   const playlist = document.getElementById("playlist");
+  const hlsPlayer = document.getElementById("hlsPlayer");
+  const iframePlayer = document.getElementById("iframePlayer");
+  const loading = document.getElementById("loadingMessage");
+
+  function loadStream(type, url) {
+    loading.style.display = "block";
+    hlsPlayer.style.display = "none";
+    iframePlayer.style.display = "none";
+
+    // Pause both players
+    hlsPlayer.pause();
+    hlsPlayer.src = "";
+    iframePlayer.src = "";
+
+    if (type === "hls") {
+      if (Hls.isSupported()) {
+        const hls = new Hls();
+        hls.loadSource(url);
+        hls.attachMedia(hlsPlayer);
+        hls.on(Hls.Events.MANIFEST_PARSED, () => {
+          hlsPlayer.style.display = "block";
+          hlsPlayer.play();
+          loading.style.display = "none";
+        });
+      } else if (hlsPlayer.canPlayType("application/vnd.apple.mpegurl")) {
+        hlsPlayer.src = url;
+        hlsPlayer.addEventListener("loadedmetadata", () => {
+          hlsPlayer.style.display = "block";
+          hlsPlayer.play();
+          loading.style.display = "none";
+        });
+      } else {
+        alert("Your browser doesn't support this stream.");
+        loading.style.display = "none";
+      }
+    } else if (type === "iframe") {
+      iframePlayer.src = url;
+      iframePlayer.style.display = "block";
+      iframePlayer.onload = () => {
+        loading.style.display = "none";
+      };
+    }
+  }
 
   matches.forEach(match => {
-    const matchItem = document.createElement("div");
-    matchItem.className = "match-item";
+    const item = document.createElement("div");
+    item.className = "match-item";
 
-    const button = document.createElement("button");
-    button.className = "match-button";
-    button.innerText = match.name;
-    button.onclick = () => loadVideo(match.link);
+    const btn = document.createElement("button");
+    btn.className = "match-button";
+    btn.innerText = match.name;
+    btn.onclick = () => loadStream(match.type, match.link);
 
-    const extButton = document.createElement("button");
-    extButton.className = "external-button";
-    extButton.innerText = "🔗";
-    extButton.onclick = () => openExternal(match.link);
+    const ext = document.createElement("button");
+    ext.className = "external-button";
+    ext.innerText = "🔗";
+    ext.onclick = () => window.location.href = `intent:${match.link}#Intent;action=android.intent.action.VIEW;type=video/mp4;end;`;
 
-    matchItem.appendChild(button);
-    matchItem.appendChild(extButton);
-    playlist.appendChild(matchItem);
+    item.appendChild(btn);
+    item.appendChild(ext);
+    playlist.appendChild(item);
   });
 
-  function loadVideo(url) {
-    const playerFrame = document.getElementById("playerFrame");
-    const loadingMessage = document.getElementById("loadingMessage");
-
-    loadingMessage.style.display = "block";
-    playerFrame.style.display = "none";
-    playerFrame.src = "";
-
-    let progress = 0;
-    const interval = setInterval(() => {
-      progress += 10;
-      loadingMessage.textContent = `Loading... ${progress}%`;
-      if (progress >= 100) {
-        clearInterval(interval);
-        loadingMessage.style.display = "none";
-        playerFrame.style.display = "block";
-        playerFrame.src = url + "?autoplay=1&muted=1";
-      }
-    }, 300);
-  }
-
-  function openExternal(url) {
-    window.location.href = `intent:${url}#Intent;action=android.intent.action.VIEW;type=video/mp4;end;`;
-  }
-
-  // Auto-load first match
-  window.onload = function () {
-    loadVideo(matches[0].link);
-  };
+  // Load the first match by default
+  window.onload = () => loadStream(matches[0].type, matches[0].link);
 </script>
 
 </body>
