@@ -94,7 +94,7 @@
 </div>
 
 <!-- Iframe Player -->
-<div id="playerContainer">
+<div id="playerContainer" onclick="blockRedirects()">
   <iframe id="playerFrame" allow="autoplay" src="https://topembed.pw/channel/exislamars"></iframe>
 </div>
 
@@ -124,6 +124,22 @@
 </a>
 
 <script>
+  // Function to block any redirects when clicking on the player
+  function blockRedirects() {
+    window.addEventListener('click', function(event) {
+      const iframe = document.getElementById('playerFrame');
+      const iframeSrc = iframe.src;
+
+      // Check if the source contains any redirection or ad-related URLs
+      const blockedUrls = ['ads', 'ad', 'redirect', 'popup', 'track'];
+      if (blockedUrls.some(url => iframeSrc.includes(url))) {
+        alert('Ad or redirect detected. Blocking...');
+        event.preventDefault(); // Preventing redirect or pop-up
+        iframe.src = ''; // Clearing iframe to stop further loading
+      }
+    });
+  }
+
   // Function to detect and block ads in iframe sources
   function blockAdsInIframe(iframe) {
     const blockedUrls = [
