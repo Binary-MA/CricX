@@ -1,57 +1,59 @@
 <!DOCTYPE html>
 <html lang="en">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Stream Player</title>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Stream Player with Ad Block</title>
   <script src="https://cdn.jsdelivr.net/npm/hls.js@latest"></script>
   <style>
     body {
-      margin: 0;
       font-family: Arial, sans-serif;
-      background-color: #f5f5f5;
       text-align: center;
-    }
-
-    .instruction-box {
-      font-size: 14px;
-      background-color: #fffae5;
-      border: 2px solid #ffce00;
-      padding: 8px;
-      margin: 10px auto;
-      width: 90%;
-      border-radius: 5px;
-      font-weight: bold;
+      background-color: #f8f9fa;
+      margin: 0;
+      padding: 0;
     }
 
     #playerContainer {
-      position: relative;
       width: 100%;
-      background-color: black;
-    }
-
-    iframe, video {
-      width: 100%;
+      max-width: 100%;
       height: 250px;
-      border: none;
-    }
-
-    #loadingMessage {
-      position: absolute;
-      top: 50%;
-      left: 50%;
-      transform: translate(-50%, -50%);
-      color: white;
-      font-size: 16px;
-      background-color: rgba(0, 0, 0, 0.7);
-      padding: 10px 15px;
-      border-radius: 5px;
-      z-index: 9;
-    }
-
-    #playlist {
-      width: 90%;
+      background-color: black;
       margin: 10px auto;
+      position: relative;
+    }
+
+    iframe {
+      width: 100%;
+      height: 100%;
+      border: none;
+      display: block;
+    }
+
+    .whatsapp-button {
+      display: inline-block;
+      background-color: #25D366;
+      color: white;
+      padding: 8px 12px;
+      font-size: 14px;
+      text-decoration: none;
+      border-radius: 5px;
+      border: 1px solid #ccc;
+      margin-top: 10px;
+    }
+
+    #videoContainer {
+      width: 100%;
+      max-width: 100%;
+      height: 400px;
+      background-color: black;
+      margin: 10px auto;
+      position: relative;
+    }
+
+    video {
+      width: 100%;
+      height: 100%;
     }
 
     .match-item {
@@ -83,127 +85,110 @@
       color: orange;
       margin-left: 5px;
     }
-
-    .whatsapp-button {
-      display: inline-block;
-      background-color: #25D366;
-      color: white;
-      padding: 8px 12px;
-      font-size: 14px;
-      text-decoration: none;
-      border-radius: 5px;
-      border: 1px solid #ccc;
-      margin-top: 10px;
-    }
-
-    #iframePlayer {
-      display: none;
-    }
-
-    #hlsPlayer {
-      display: none;
-    }
   </style>
 </head>
 <body>
 
 <div class="instruction-box">
-  Click on a match to play. Use MX/VLC if it stops (🔗).
+  Click on a match name or video to play. If it stops, refresh or try an MX or VLC player etc. by clicking on (🔗).
 </div>
 
+<!-- Iframe Player -->
 <div id="playerContainer">
-  <div id="loadingMessage">Loading... Please wait</div>
-
-  <video id="hlsPlayer" controls autoplay muted></video>
-  <iframe id="iframePlayer" sandbox="allow-scripts allow-same-origin allow-presentation" allowfullscreen></iframe>
+  <iframe id="playerFrame" allow="autoplay" src="https://topembed.pw/channel/exislamars"></iframe>
 </div>
 
-<div id="playlist"></div>
+<!-- Playlist for Different Streams -->
+<div id="playlist">
+  <div class="match-item">
+    <button class="match-button" onclick="loadIframeVideo('https://topembed.pw/channel/exislamars')">PSL Link 1</button>
+    <button class="external-button" onclick="openExternal('https://topembed.pw/channel/exislamars')">🔗</button>
+  </div>
+  <div class="match-item">
+    <button class="match-button" onclick="loadIframeVideo('https://topembed.pw/channel/SkySportsMix[UK]')">PSL Link 2</button>
+    <button class="external-button" onclick="openExternal('https://topembed.pw/channel/SkySportsMix[UK]')">🔗</button>
+  </div>
+  <div class="match-item">
+    <button class="match-button" onclick="loadM3U8Stream('https://topembed.pw/channel/SkySport.m3u8')">PSL Link 3 (M3U8)</button>
+    <button class="external-button" onclick="openExternal('https://topembed.pw/channel/SkySport.m3u8')">🔗</button>
+  </div>
+  <div class="match-item">
+    <button class="match-button" onclick="loadIframeVideo('https://topembed.pw/channel/SkySportsMix[UK]')">PSL Link 4</button>
+    <button class="external-button" onclick="openExternal('https://topembed.pw/channel/SkySportsMix[UK]')">🔗</button>
+  </div>
+</div>
 
+<!-- WhatsApp Button -->
 <a href="https://chat.whatsapp.com/YOUR-GROUP-LINK" class="whatsapp-button">
   Join WhatsApp Group
 </a>
 
 <script>
-  const matches = [
-    {
-      name: "M3U8 Link 1",
-      type: "hls",
-      link: "https://edge11.ekiga.live/psl2024/tracks-v1a1/mono.m3u8"
-    },
-    {
-      name: "Iframe Link 2",
-      type: "iframe",
-      link: "https://short.ink/embedpage" // your embed iframe URL
-    }
-  ];
+  // Function to detect and block ads in iframe sources
+  function blockAdsInIframe(iframe) {
+    const blockedUrls = [
+      'ads', 'ad', 'banner', 'popup', 'track', 'servead', 'adserver', // Common ad-related URLs
+      'doubleclick', 'googlesyndication', 'adclick', 'impression', 'adsense'
+    ];
 
-  const playlist = document.getElementById("playlist");
-  const hlsPlayer = document.getElementById("hlsPlayer");
-  const iframePlayer = document.getElementById("iframePlayer");
-  const loading = document.getElementById("loadingMessage");
+    // Check if iframe source contains any ad-related keywords
+    const iframeSrc = iframe.src || '';
 
-  function loadStream(type, url) {
-    loading.style.display = "block";
-    hlsPlayer.style.display = "none";
-    iframePlayer.style.display = "none";
-
-    // Pause both players
-    hlsPlayer.pause();
-    hlsPlayer.src = "";
-    iframePlayer.src = "";
-
-    if (type === "hls") {
-      if (Hls.isSupported()) {
-        const hls = new Hls();
-        hls.loadSource(url);
-        hls.attachMedia(hlsPlayer);
-        hls.on(Hls.Events.MANIFEST_PARSED, () => {
-          hlsPlayer.style.display = "block";
-          hlsPlayer.play();
-          loading.style.display = "none";
-        });
-      } else if (hlsPlayer.canPlayType("application/vnd.apple.mpegurl")) {
-        hlsPlayer.src = url;
-        hlsPlayer.addEventListener("loadedmetadata", () => {
-          hlsPlayer.style.display = "block";
-          hlsPlayer.play();
-          loading.style.display = "none";
-        });
-      } else {
-        alert("Your browser doesn't support this stream.");
-        loading.style.display = "none";
-      }
-    } else if (type === "iframe") {
-      iframePlayer.src = url;
-      iframePlayer.style.display = "block";
-      iframePlayer.onload = () => {
-        loading.style.display = "none";
-      };
+    if (blockedUrls.some(url => iframeSrc.includes(url))) {
+      iframe.style.display = 'none';  // Hide the ad iframe
+      console.log('Ad blocked in iframe!');
     }
   }
 
-  matches.forEach(match => {
-    const item = document.createElement("div");
-    item.className = "match-item";
+  // Function to load iframe video
+  function loadIframeVideo(url) {
+    const iframe = document.getElementById('playerFrame');
+    iframe.src = url;
 
-    const btn = document.createElement("button");
-    btn.className = "match-button";
-    btn.innerText = match.name;
-    btn.onclick = () => loadStream(match.type, match.link);
+    // Call the function to check for ads when iframe is loaded
+    iframe.onload = () => blockAdsInIframe(iframe);
+  }
 
-    const ext = document.createElement("button");
-    ext.className = "external-button";
-    ext.innerText = "🔗";
-    ext.onclick = () => window.location.href = `intent:${match.link}#Intent;action=android.intent.action.VIEW;type=video/mp4;end;`;
+  // Function to open external link (e.g., VLC or MX Player)
+  function openExternal(url) {
+    window.location.href = `intent:${url}#Intent;action=android.intent.action.VIEW;type=video/mp4;end;`;
+  }
 
-    item.appendChild(btn);
-    item.appendChild(ext);
-    playlist.appendChild(item);
-  });
+  // Function to handle M3U8 video stream with HLS.js
+  function loadM3U8Stream(url) {
+    const video = document.createElement('video');
+    const videoContainer = document.getElementById('videoContainer');
+    videoContainer.innerHTML = ''; // Clear previous video
+    videoContainer.appendChild(video);
 
-  // Load the first match by default
-  window.onload = () => loadStream(matches[0].type, matches[0].link);
+    if (Hls.isSupported()) {
+      const hls = new Hls();
+
+      // Example: blocking ads by filtering out certain URL patterns
+      hls.on(Hls.Events.MANIFEST_PARSED, function(event, data) {
+        // Filter out any segments that may include ads
+        data.levels.forEach(level => {
+          if (level.url.includes('ads')) {
+            level.url = level.url.replace('ads', ''); // Remove ads from URL (as an example)
+          }
+        });
+      });
+
+      hls.loadSource(url);
+      hls.attachMedia(video);
+      hls.on(Hls.Events.MANIFEST_PARSED, () => {
+        video.play();
+      });
+    } else {
+      console.error('HLS.js is not supported on your browser.');
+    }
+  }
+
+  // Auto-load the first iframe stream when the page is loaded
+  window.onload = function () {
+    loadIframeVideo('https://topembed.pw/channel/exislamars');
+  };
+
 </script>
 
 </body>
